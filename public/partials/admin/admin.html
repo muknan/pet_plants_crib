@@ -1,0 +1,372 @@
+
+
+    <!-- Admin -->
+    <div class="admin" ng-controller="adminController">
+        <div class="container">
+
+            <div class="title">
+                <span>Admin Dashboard</span>
+            </div>
+
+            <div class="dashboard">
+                <div class="notifications">
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="notice user" ng-click="scroll('users')">
+                            <div class="icon">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div class="message">
+                                <span class="number">{{ num_users }}</span>
+                                <span class="type">users</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="notice posting" ng-click="scroll('postings')">
+                            <div class="icon">
+                                <i class="fa fa-pencil-square-o"></i>
+                            </div>
+                            <div class="message">
+                                <span class="number">{{ num_postings }}</span>
+                                <span class="type">posts</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 col-xs-12">
+                        <div class="notice report" ng-click="scroll('reports')">
+                            <div class="icon">
+                                <i class="fa fa-flag"></i>
+                            </div>
+                            <div class="message">
+                                <span class="number">{{ num_reports }}</span>
+                                <span class="type">reports</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+
+            <!-- User Panel -->
+            <div class="panel panel-default" id="users">
+                <div class="panel-heading">Users</div>
+
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Profile</th>
+                                    <th>Message</th>
+                                    <th>Edit Info</th>
+                                    <th>Ban User</th>
+                                    <th>Admin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="user in users">
+                                    <td>{{ user.name }}</td>
+                                    <td>
+                                        <a href="users/{{ user._id }}" target="_blank">
+                                            <button class="admin-button view">View</button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button message" data-toggle="modal" data-target="#messageModal" ng-click="setUserId(user._id)">Message</button>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button edit" data-toggle="modal" data-target="#userModal" ng-click="setUserId(user._id)">Edit</button>
+                                    </td>
+                                    <td>
+                                        <button ng-attr-id="{{ 'ban-btn-' + user._id }}" class="admin-button delete" data-toggle="modal" data-target="#banModal" ng-click="setUserId(user._id)">{{ user.banned ? 'Banned' : 'Ban' }}</button>
+                                    </td>
+                                    <td>
+                                        <button ng-attr-id="{{ 'admin-btn-' + user._id }}" ng-attr-id="{{ 'ban-btn-' + user._id }}" class="admin-button message" data-toggle="modal" data-target="#makeAdminModal" ng-click="setUserRole(user.role, user._id)">{{ user.role == 'admin' ? 'Remove admin' : 'Make admin' }}</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Postings Panel -->
+            <div class="panel panel-default" id="postings">
+                <div class="panel-heading">Postings</div>
+
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>View</th>
+                                    <th>Edit Posting</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="posting in petPostings"  ng-attr-id="{{ 'pet-post-' + posting._id }}">
+                                    <td>{{ posting.created_at | date:'medium' }}</td>
+                                    <td>
+                                        <a href="pet_posts/{{ posting._id }}" target="_blank">
+                                            <button class="admin-button view">Pet Post {{ posting._id }}</button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button edit" data-toggle="modal" data-target="#postModal" ng-click="setPostingId('petpostings', posting._id)">Edit</button>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button delete" data-toggle="modal" data-target="#deleteModal" ng-click="setPostingId('pet_posting', posting._id)" >Delete</button>
+                                    </td>
+                                </tr>
+                                <tr ng-repeat="posting in sitterPostings" ng-attr-id="{{ 'sitter-post-' + posting._id }}">
+                                    <td>{{ posting.created_at | date:'medium' }}</td>
+                                    <td>
+                                        <a href="petsitter_posts/{{ posting._id }}" target="_blank">
+                                            <button class="admin-button view">Sitter Post {{ posting._id }}</button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button edit" data-toggle="modal" data-target="#postModal" ng-click="setPostingId('sitterpostings', posting._id)" >Edit</button>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button delete" data-toggle="modal" data-target="#deleteModal" ng-click="setPostingId('sitter_posting', posting._id)">Delete</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Panel -->
+            <div class="panel panel-default" id="reports">
+                <div class="panel-heading">Reports</div>
+
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Reported by</th>
+                                    <th>Reporting</th>
+                                    <th>Read Report</th>
+                                    <th>Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="report in reports">
+                                    <td>{{ report.created_at | date:'medium' }}</td>
+                                    <td>
+                                        <a href="users/{{ report.from._id }}" target="_blank">
+                                            <button class="admin-button view">{{ report.from.name }}</button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <a href="users/{{ report.to._id }}" target="_blank">
+                                            <button class="admin-button delete">{{ report.to.name }}</button>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button edit" data-toggle="modal" data-target="#reportModal" ng-click="setReportMessage(report.message)">Read</button>
+                                    </td>
+                                    <td>
+                                        <button class="admin-button message" data-toggle="modal" data-target="#messageModal" ng-click="setUserId(report.to._id)">Message</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Report Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Report Message</h4>
+                </div>
+                <div class="modal-body" ng-bind="reportMessage">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ban Modal -->
+    <div class="modal fade" id="banModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminModalController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Action</h4>
+                </div>
+                <div class="modal-body">
+                    Ban this user permanently?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="ConfirmBan()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Make Admin Modal -->
+    <div class="modal fade" id="makeAdminModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminModalController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Action</h4>
+                </div>
+                <div class="modal-body">
+                    Update the role of this user?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="ConfirmAdmin()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Confirm Action</h4>
+                </div>
+                <div class="modal-body">
+                    This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="ConfirmDelete()">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminModalController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Message</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form">
+                        <div class="form-group">
+                            <textarea name="comment" ng-model="msg_content"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="sendMsg()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit User Info Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminModalController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit User Info</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" name="userForm">
+                        <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" class="form-control" name="user_name" ng-model="user_name" required>
+                            <span ng-show="userForm.user_name.$touched && userForm.user_name.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Location:</label>
+                            <input type="text" class="form-control" name="location" ng-model="user_location" required>
+                            <span ng-show="userForm.location.$touched && userForm.location.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea name="description" ng-model="user_description" required></textarea>
+                            <span ng-show="userForm.description.$touched && userForm.description.$invalid">This field is required.</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div ng-messages="userForm.$error" style="color:maroon" role="alert">
+                        <div ng-message="required">Please enter all fields.</div>
+                    </div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editUserInfo(userForm.$valid)">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Posting Modal -->
+    <div class="modal fade" id="postModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" ng-controller="adminModalController">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit Posting</h4>
+                </div>
+                <div class="modal-body">
+                    <form role="form" name="postingForm">
+                        <div class="form-group">
+                            <label for="name">Title:</label>
+                            <input type="text" class="form-control" name="name" ng-model="posting_title" required>
+                            <span ng-show="postingForm.name.$touched && postingForm.name.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="pet">Duration:</label>
+                            <input type="text" class="form-control" name="duration" ng-model="posting_duration" required>
+                            <span ng-show="postingForm.duration.$touched && postingForm.duration.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="date">Location:</label>
+                            <input type="text" class="form-control" name="date" ng-model="posting_location" required>
+                            <span ng-show="postingForm.date.$touched && postingForm.date.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="location">Price:</label>
+                            <input type="text" class="form-control" name="location" ng-model="posting_price" required>
+                            <span ng-show="postingForm.location.$touched && postingForm.location.$invalid">This field is required.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description:</label>
+                            <textarea name="description" ng-model="posting_description" required></textarea>
+                            <span ng-show="postingForm.petImageToUpload.$touched && postingForm.petImageToUpload.$invalid">This field is required.</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div ng-messages="postingForm.$error" style="color:maroon" role="alert">
+                        <div ng-message="required">Please enter all fields.</div>
+                    </div>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="editPostingInfo(postingForm.$valid)">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
